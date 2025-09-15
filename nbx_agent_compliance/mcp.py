@@ -40,9 +40,9 @@ def create_mcp_server(
     # Default to read-only tools for safety
     if allowed_tools is None:
         allowed_tools = [
-            "get_objects",
-            "get_object_by_id", 
-            "get_changelogs",
+            "netbox_get_objects",
+            "netbox_get_object_by_id",
+            "netbox_get_changelogs",
         ]
     
     # Expand user directory and verify the MCP server directory exists

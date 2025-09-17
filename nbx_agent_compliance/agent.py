@@ -21,7 +21,7 @@ async def run_once(
 ) -> Dict[str, Any]:
     """
     Run a single compliance check against NetBox.
-    
+
     Args:
         rule: Natural language compliance rule
         scope: Scope dictionary (site, rack, device)
@@ -32,53 +32,57 @@ async def run_once(
         netbox_token: NetBox API token
         limit: Optional limit on number of objects to check
         max_steps: Maximum number of agent steps
-    
+
     Returns:
         Dictionary containing compliance check results
     """
-    
+
     # Create MCP server connection
     async with create_mcp_server(
         mcp_dir=mcp_dir,
         netbox_url=netbox_url,
         netbox_token=netbox_token,
     ) as server:
-        
-        # Set OPENAI_API_KEY to suppress trace warnings (use actual key if available)
-        if api_key and not os.getenv("OPENAI_API_KEY"):
-            os.environ["OPENAI_API_KEY"] = api_key
-        elif not os.getenv("OPENAI_API_KEY"):
-            os.environ["OPENAI_API_KEY"] = os.getenv("API_KEY", "dummy")
-        
+        # Get API key and validate it exists
+        final_api_key = api_key or os.getenv("API_KEY")
+        if not final_api_key:
+            raise ValueError(
+                "API key is required. Set API_KEY environment variable or use --api-key option."
+            )
+
+        # Set OPENAI_API_KEY to suppress trace warnings
+        if not os.getenv("OPENAI_API_KEY"):
+            os.environ["OPENAI_API_KEY"] = final_api_key
+
         # Initialize the agent with LiteLLM model
         agent = Agent(
             name="NetBoxComplianceChecker",
             instructions=SYSTEM_INSTRUCTIONS,
             model=LitellmModel(
                 model=model,
-                api_key=api_key or os.getenv("API_KEY"),
+                api_key=final_api_key,
             ),
             mcp_servers=[server],
         )
-        
+
         # Prepare the initial message
         initial_message = f"""Check this compliance rule: {rule}
 
-Scope: {', '.join(f'{k}={v}' for k, v in scope.items())}"""
-        
+Scope: {", ".join(f"{k}={v}" for k, v in scope.items())}"""
+
         if limit:
             initial_message += f"\nLimit: Check up to {limit} objects only (demo mode)"
-        
+
         # Run the agent
         result = await Runner.run(
             starting_agent=agent,
             input=initial_message,
             max_turns=max_steps,
         )
-        
+
         # Get tool call count from the server
-        tool_calls = server.tool_call_count if hasattr(server, 'tool_call_count') else 0
-        
+        tool_calls = server.tool_call_count if hasattr(server, "tool_call_count") else 0
+
         # Parse the agent's response with tool count
         return parse_agent_response(result, tool_calls)
 
@@ -86,25 +90,29 @@ Scope: {', '.join(f'{k}={v}' for k, v in scope.items())}"""
 def parse_agent_response(response: Any, tool_calls: int = 0) -> Dict[str, Any]:
     """
     Extract minimal information from agent response.
-    
+
     Args:
         response: Raw response from the agent
         tool_calls: Number of tool calls made
-    
+
     Returns:
         Dictionary with raw output and basic metadata
     """
-    
+
     # Get the raw output
-    raw_output = str(response.final_output) if hasattr(response, "final_output") else str(response)
-    
-    # Extract just the status for basic routing
+    raw_output = (
+        str(response.final_output)
+        if hasattr(response, "final_output")
+        else str(response)
+    )
+
+    # Extract status from the structured output format
     status = "UNKNOWN"
-    if "FAIL" in raw_output.upper():
+    if "Status: FAIL" in raw_output:
         status = "FAIL"
-    elif "PASS" in raw_output.upper():
+    elif "Status: PASS" in raw_output:
         status = "PASS"
-    
+
     return {
         "raw_output": raw_output,
         "status": status,

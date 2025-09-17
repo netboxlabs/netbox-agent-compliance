@@ -21,8 +21,11 @@ Read about this agent in the related [blog post from NetBox Labs](FIXME).
 1. Python 3.10 or higher
 2. NetBox instance with API access
 3. [NetBox MCP server](https://github.com/netboxlabs/netbox-mcp-server) installed
+4. [uv](https://github.com/astral-sh/uv) installed
 
 ### Setup
+
+Start by creating a fork of the repository.
 
 1. Clone this repository:
 ```bash
@@ -41,7 +44,7 @@ uv pip install -e .
 ```bash
 export NETBOX_URL="https://your-netbox-instance.com"
 export NETBOX_TOKEN="your-netbox-api-token"
-export API_KEY="your-openai-or-anthropic-api-key"
+export API_KEY="your-openai-or-anthropic-api-key" # Depends on the --model that you use, currently defaults to openai/gpt-5-nano
 export MCP_SERVER_DIR="~/netbox-mcp-server"  # Path to NetBox MCP server
 ```
 
@@ -133,7 +136,7 @@ Examined 4 devices in the DM-Akron site.
 
 When you provide a rule that can't be checked with NetBox data:
 
-```
+```bash
 nbx-agent-compliance "all devices must have SNMP credentials configured" --site "DM-Akron"
 
 Compliance Check Results

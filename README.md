@@ -29,8 +29,8 @@ Start by creating a fork of the repository.
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/nbx-agent-compliance.git
-cd nbx-agent-compliance
+git clone https://github.com/yourusername/netbox-agent-compliance.git
+cd netbox-agent-compliance
 ```
 
 2. Create virtual environment and install:
@@ -62,18 +62,18 @@ MCP_SERVER_DIR=~/netbox-mcp-server
 
 Check that every interface in a site has an assigned IP address:
 ```bash
-nbx-agent-compliance "every interface should have an assigned ip address" --site "NYC"
+netbox-agent-compliance "every interface should have an assigned ip address" --site "NYC"
 ```
 
 Check that devices in a rack have primary IPs:
 ```bash
-nbx-agent-compliance "every device should have a primary IPv4 or IPv6" --rack "R01"
+netbox-agent-compliance "every device should have a primary IPv4 or IPv6" --rack "R01"
 ```
 
 ### Command Options
 
 ```bash
-nbx-agent-compliance [RULE] [OPTIONS]
+netbox-agent-compliance [RULE] [OPTIONS]
 
 Arguments:
   RULE  Natural language compliance rule to check
@@ -137,7 +137,7 @@ Examined 4 devices in the DM-Akron site.
 When you provide a rule that can't be checked with NetBox data:
 
 ```bash
-nbx-agent-compliance "all devices must have SNMP credentials configured" --site "DM-Akron"
+netbox-agent-compliance "all devices must have SNMP credentials configured" --site "DM-Akron"
 
 Compliance Check Results
 Time: 19.19s | Tool calls: 0
@@ -198,7 +198,7 @@ The system consists of four minimal modules:
 
 Test individual compliance checks:
 ```bash
-nbx-agent-compliance "every device should have a primary IPv4 or IPv6" --site "DM-Akron"
+netbox-agent-compliance "every device should have a primary IPv4 or IPv6" --site "DM-Akron"
 ```
 
 ## Limitations

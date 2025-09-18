@@ -1,5 +1,5 @@
 [project]
-name = "nbx-agent-compliance"
+name = "netbox-agent-compliance"
 version = "0.1.0"
 description = "A lean NetBox compliance agent using MCP and OpenAI Agents SDK"
 readme = "README.md"
@@ -14,11 +14,11 @@ dependencies = [
 ]
 
 [project.scripts]
-nbx-agent-compliance = "nbx_agent_compliance.cli:main"
+netbox-agent-compliance = "netbox_agent_compliance.cli:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["nbx_agent_compliance"]
+packages = ["netbox_agent_compliance"]

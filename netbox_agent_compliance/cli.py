@@ -14,7 +14,7 @@ from .agent import run_once
 load_dotenv()
 
 app = typer.Typer(
-    name="nbx-agent-compliance",
+    name="netbox-agent-compliance",
     help="NetBox compliance checking using AI agents and MCP",
 )
 console = Console()

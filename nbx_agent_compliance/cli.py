@@ -87,7 +87,7 @@ def check(
     ),
 ):
     """Run a compliance check against NetBox."""
-    
+
     # Build scope dictionary
     scope = {}
     if site:
@@ -96,30 +96,38 @@ def check(
         scope["rack"] = rack
     if device:
         scope["device"] = device
-    
+
     if not scope:
-        console.print("[red]Error: At least one scope (--site, --rack, or --device) must be specified[/red]")
+        console.print(
+            "[red]Error: At least one scope (--site, --rack, or --device) must be specified[/red]"
+        )
         sys.exit(1)
-    
+
     # Validate required environment variables
     if not netbox_url:
-        console.print("[red]Error: NETBOX_URL environment variable or --netbox-url option is required[/red]")
+        console.print(
+            "[red]Error: NETBOX_URL environment variable or --netbox-url option is required[/red]"
+        )
         sys.exit(1)
-    
+
     if not netbox_token:
-        console.print("[red]Error: NETBOX_TOKEN environment variable or --netbox-token option is required[/red]")
+        console.print(
+            "[red]Error: NETBOX_TOKEN environment variable or --netbox-token option is required[/red]"
+        )
         sys.exit(1)
-    
+
     # Expand user directory
     mcp_dir = os.path.expanduser(mcp_dir)
-    
+
     # Run the compliance check
     console.print(f"[blue]Running compliance check: {rule}[/blue]")
-    console.print(f"[blue]Scope: {', '.join(f'{k}={v}' for k, v in scope.items())}[/blue]")
+    console.print(
+        f"[blue]Scope: {', '.join(f'{k}={v}' for k, v in scope.items())}[/blue]"
+    )
     console.print(f"[blue]Model: {model}[/blue]\n")
-    
+
     start_time = time.time()
-    
+
     try:
         # Run the async agent
         result = asyncio.run(
@@ -135,16 +143,18 @@ def check(
                 max_steps=max_steps,
             )
         )
-        
+
         elapsed_time = time.time() - start_time
-        
+
         # Display the header
-        console.print(f"\n[bold blue]Compliance Check Results[/bold blue]")
-        console.print(f"[dim]Time: {elapsed_time:.2f}s | Tool calls: {result.get('tool_calls', 0)}[/dim]\n")
-        
+        console.print("\n[bold blue]Compliance Check Results[/bold blue]")
+        console.print(
+            f"[dim]Time: {elapsed_time:.2f}s | Tool calls: {result.get('tool_calls', 0)}[/dim]\n"
+        )
+
         # Display the agent's markdown output directly
         console.print(Markdown(result.get("raw_output", "No output received")))
-    
+
     except Exception as e:
         console.print(f"[red]Error running compliance check: {e}[/red]")
         sys.exit(1)

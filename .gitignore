@@ -52,3 +52,6 @@ dmypy.json
 
 # Logs
 *.log
+
+# uv lock file
+uv.lock

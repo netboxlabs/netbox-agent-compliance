@@ -29,7 +29,7 @@ Start by creating a fork of the repository.
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/netbox-agent-compliance.git
+git clone https://github.com/netboxlabs/netbox-agent-compliance.git
 cd netbox-agent-compliance
 ```
 

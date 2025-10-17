@@ -4,7 +4,7 @@ A lean agent that performs NetBox compliance checks using natural language rules
 
 NetBox is the semantic map for network and infrastructure AI. The [NetBox MCP server](https://github.com/netboxlabs/netbox-mcp-server) makes it easy to build powerful agents atop NetBox's structured context. This agent is a simple example. Clone it, remix it, or simply use it as a bit of inspiration to get started building your own NetBox agents. Be sure to share what you build in the [NetBox Slack](https://netdev.chat/) and on social media so the community can learn together!
 
-Read about this agent in the related [blog post from NetBox Labs](FIXME).
+Read about this agent in the related [blog post from NetBox Labs](https://netboxlabs.com/blog/build-your-first-netbox-ai-agent-workshop-recap/).
 
 ## Features
 

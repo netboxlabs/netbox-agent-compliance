@@ -75,15 +75,16 @@ def create_mcp_server(
             "netbox_get_objects",  # List objects with filters
             "netbox_get_object_by_id",  # Get specific object details
             "netbox_get_changelogs",  # View change history
+            "netbox_search_objects",  # Search objects (v1.0.0+)
         ]
 
     # Expand user directory and verify the MCP server directory exists
     mcp_dir = os.path.expanduser(mcp_dir)
-    server_path = os.path.join(mcp_dir, "server.py")
-    if not os.path.exists(server_path):
+    pyproject_path = os.path.join(mcp_dir, "pyproject.toml")
+    if not os.path.exists(pyproject_path):
         raise FileNotFoundError(
-            f"NetBox MCP server not found at {server_path}. "
-            f"Please ensure the server is installed at {mcp_dir}"
+            f"NetBox MCP server not found at {mcp_dir}. "
+            f"Please ensure the netbox-mcp-server is installed at {mcp_dir}"
         )
 
     # Create the MCP server configuration
@@ -97,7 +98,7 @@ def create_mcp_server(
         params={
             # Command to spawn the MCP server subprocess
             "command": "uv",
-            "args": ["--directory", mcp_dir, "run", "server.py"],
+            "args": ["--directory", mcp_dir, "run", "netbox-mcp-server"],
             # Environment variables for the subprocess
             "env": {
                 "NETBOX_URL": netbox_url,

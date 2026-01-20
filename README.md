@@ -20,7 +20,7 @@ Read about this agent in the related [blog post from NetBox Labs](https://netbox
 
 1. Python 3.10 or higher
 2. NetBox instance with API access
-3. [NetBox MCP server](https://github.com/netboxlabs/netbox-mcp-server) installed
+3. [NetBox MCP server](https://github.com/netboxlabs/netbox-mcp-server) v1.0.0+ installed
 4. [uv](https://github.com/astral-sh/uv) installed
 
 ### Setup

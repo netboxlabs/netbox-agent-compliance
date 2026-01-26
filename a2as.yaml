@@ -1,0 +1,132 @@
+manifest:
+  version: "0.1.2"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: netboxlabs/netbox-agent-compliance
+    source: https://github.com/netboxlabs/netbox-agent-compliance
+    branch: main
+    commit: "f7e8adf7"
+    scope: [netbox_agent_compliance/agent.py, netbox_agent_compliance/mcp.py, netbox_agent_compliance/prompts.py]
+  issued:
+    by: A2AS.org
+    at: '2026-01-26T16:13:18Z'
+  signatures:
+    digest: sha256:oSe55kDpHSLm-FKM-Vqazce3QSrSFJ7WfLTlvjMmjgM
+    key: ed25519:4YUzfKDRcM-pe9YNbtAlBqeRRNmebo7tgDtrXw6pWPg
+    sig: ed25519:irXaq6HMHW0YCYN8OQpDAtxoNJaMxZ1qvj4EU48Gydvyw1BaFC7iZpwx_2_GIrNSKYczX0FiiiaTPrsjsoEZDg
+
+agents:
+  agent:
+    type: instance
+    models: [LitellmModel]
+    mcp: [server]
+    params:
+      function: run_once
+      name: NetBoxComplianceChecker
+      instructions: [You check NetBox compliance rules using MCP tools., 'Important: NetBox stores network infrastructure
+          data like devices, interfaces, IPs, VLANs, and racks.', 'It does NOT store: SNMP credentials, passwords, SSH keys,
+          monitoring status, or configuration files.', 'When given a rule and scope:', 1. First determine if the rule can
+          be checked with NetBox data, '2. If it cannot (e.g., SNMP credentials), explain this and suggest what CAN be checked',
+        '3. If it can be checked, query the relevant objects and report compliance', 'Format your response as markdown with:',
+        '- **Status**: PASS or FAIL', '- **Summary**: What was checked and the outcome', '- **Findings**: List any non-compliant
+          items (if FAIL)', '- **Coverage**: What was examined (e.g., "Checked 4 devices in site DM-Akron")', 'Example response
+          for a failing check:', '## Status: FAIL', '## Summary', Checked all devices in site DM-Akron for primary IP addresses.
+          Found 4 devices without primary IPs., '## Findings', '- dmi01-akron-rtr01: No primary IPv4 or IPv6', '- dmi01-akron-sw01:
+          No primary IPv4 or IPv6', '- dmi01-akron-pdu01: No primary IPv4 or IPv6', '- Patch Panel 01: No primary IPv4 or
+          IPv6', '## Coverage', Examined 4 devices in the DM-Akron site.]
+
+models:
+  LitellmModel:
+    type: function
+    agents: [agent]
+
+mcp:
+  server:
+    type: process
+    agents: [agent]
+    params:
+      dynamic: "True"
+
+imports:
+  Agent: agents.Agent
+  Any: typing.Any
+  asyncio: asyncio
+  Console: rich.console.Console
+  create_mcp_server: mcp.create_mcp_server
+  create_static_tool_filter: agents.mcp.create_static_tool_filter
+  Dict: typing.Dict
+  List: typing.List
+  LitellmModel: agents.extensions.models.litellm_model.LitellmModel
+  load_dotenv: dotenv.load_dotenv
+  Markdown: rich.markdown.Markdown
+  MCPServerStdio: agents.mcp.MCPServerStdio
+  Optional: typing.Optional
+  os: os
+  run_once: agent.run_once
+  Runner: agents.Runner
+  sys: sys
+  SYSTEM_INSTRUCTIONS: prompts.SYSTEM_INSTRUCTIONS
+  time: time
+  typer: typer
+
+functions:
+  __init__:
+    type: sync
+    module: netbox_agent_compliance.mcp
+    args: [self]
+  call_tool:
+    type: async
+    module: netbox_agent_compliance.mcp
+    args: [self]
+    params:
+      returns: Any
+  check:
+    type: sync
+    module: netbox_agent_compliance.cli
+    args: [rule, site, rack, device, model, api_key, netbox_url, netbox_token, mcp_dir, limit, max_steps]
+  create_mcp_server:
+    type: sync
+    module: netbox_agent_compliance.mcp
+    args: [mcp_dir, netbox_url, netbox_token, allowed_tools]
+    params:
+      returns: MCPServerStdio
+  main:
+    type: sync
+    module: netbox_agent_compliance.cli
+  parse_agent_response:
+    type: sync
+    module: netbox_agent_compliance.agent
+    args: [response, tool_calls]
+    params:
+      returns: Dict
+  run_once:
+    type: async
+    module: netbox_agent_compliance.agent
+    args: [rule, scope, model, api_key, mcp_dir, netbox_url, netbox_token, limit, max_steps]
+    params:
+      returns: Dict
+
+variables:
+  API_KEY:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [netbox_agent_compliance.agent]
+  OPENAI_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv, os.environ]
+      path: [netbox_agent_compliance.agent]
+
+files:
+  pyproject.toml:
+    type: literal
+    actions: [read]
+    params:
+      caller: [os.path.join]
+      path: [mcp_dir]
+  pyproject_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.path.exists]
